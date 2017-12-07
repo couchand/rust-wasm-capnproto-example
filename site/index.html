@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title> cargo wasm </title>
+    <script src="bundle.js"></script>
+  </head>
+  <body>
+    <h1>Rust WASM Cap'n Proto Example</h1>
+    Expecting X to be 42 and Y to be pi.
+    <h2>Making a message in WASM.</h2>
+    <h3>Reading from JS.</h3>
+    X: <span id="wasm-js-x"></span>
+    Y: <span id="wasm-js-y"></span>
+    <h3>Reading from WASM.</h3>
+    X: <span id="wasm-wasm-x"></span>
+    Y: <span id="wasm-wasm-y"></span>
+    <h2>Making a message in JS.</h2>
+    <h3>Reading from WASM.</h3>
+    X: <span id="js-wasm-x"></span>
+    Y: <span id="js-wasm-y"></span>
+  </body>
+</html>

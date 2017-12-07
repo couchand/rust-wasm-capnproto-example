@@ -1,0 +1,19 @@
+{
+  "name": "capnproto-example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Andrew Couch <hi@andrewcou.ch>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "capnp-ts": "^0.2.4"
+  },
+  "devDependencies": {
+    "capnpc-js": "^0.2.4",
+    "webpack": "^3.10.0"
+  },
+  "scripts": {
+    "capnpc": "capnpc -o node_modules/.bin/capnpc-js:build schema/example.capnp",
+    "webpack": "webpack -d --devtool source-map js/index.js site/bundle.js"
+  }
+}

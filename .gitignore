@@ -1,0 +1,9 @@
+/target/
+**/*.rs.bk
+Cargo.lock
+
+/build/
+/site/capnproto_example.wasm
+/site/bundle.js
+/site/bundle.js.map
+/node_modules/

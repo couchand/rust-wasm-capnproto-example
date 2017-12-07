@@ -1,0 +1,14 @@
+[package]
+name = "capnproto-example"
+version = "0.1.0"
+authors = ["Andrew Couch <hi@andrewcou.ch>"]
+build = "build.rs"
+
+[build-dependencies]
+capnpc = "0.8"
+
+[dependencies]
+capnp = "0.8.12"
+
+[lib]
+crate-type = ["cdylib"]
