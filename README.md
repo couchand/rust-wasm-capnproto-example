@@ -1,31 +1,31 @@
-rust-wasm-capnproto-example
-===========================
+# rust-wasm-capnproto-example
 
 This is a little demonstration of Rust compiling to WASM, and using
 Cap'n Proto messages as a high-bandwidth communication channel between
 the Rust/WASM code and JavaScript code.
 
-dependencies
-------------
+## Uses
 
-Languages:
+* Rust (currently a nightly)
 
-- Rust (currently a nightly)
-- Your browser of choice supporting JavaScript and WASM
+* Cap'n Proto libraries:
 
-Cap'n Proto libraries:
-- [capnproto-rust](https://github.com/capnproto/capnproto-rust)
-- [capnp-ts](https://github.com/jdiaz5513/capnp-ts)
+  * [capnproto-rust](https://github.com/capnproto/capnproto-rust)
+  * [capnp-ts](https://github.com/jdiaz5513/capnp-ts)
 
-Build tools:
-- Rustup & Cargo
-- [cargo-wa](https://github.com/mgattozzi/cargo-wa)
-- Yarn or NPM
-- Webpack
-- Make
+## build dependencies
 
-getting started
----------------
+* Rustup & Cargo
+* [cargo-wasm](https://github.com/mgattozzi/cargo-wasm)
+* [`capnp` tool](https://capnproto.org/install.html)
+* Yarn or NPM
+* Make
+
+## runtime dependencies
+
+* Your browser of choice supporting JavaScript and WASM
+
+## getting started
 
 1. Install the Rust nightly.
 
@@ -33,11 +33,11 @@ getting started
 > rustup toolchain install nightly
 ```
 
-2. Install & setup cargo-wa.
+2. Install & setup cargo-wasm.
 
 ```sh
-> cargo install cargo-wa
-> cargo wa setup
+> cargo install cargo-wasm
+> cargo wasm setup
 ```
 
 3. Clone the repository.
@@ -64,17 +64,15 @@ getting started
 > xdg-open site/index.html
 ```
 
-more information
-----------------
+## more information
 
 Read the code & build config, there's only like 200 lines of code.
 
 * [killercup/wasm-experiments](https://github.com/killercup/wasm-experiments/)
 * [Cap'n Proto](https://capnproto.org/)
 
-caveat
-------
+## caveat
 
-I'm new to Rust, so the code's not great.  Please submit a PR!
+I'm new to Rust, so the code's not great. Please submit a PR!
 
-##### ╭╮☲☲☲╭╮ #####
+##### ╭╮☲☲☲╭╮

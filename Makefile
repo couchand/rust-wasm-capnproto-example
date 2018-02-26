@@ -8,7 +8,7 @@ rust: site/capnproto_example.wasm
 js: site/bundle.js
 
 site/capnproto_example.wasm: src/lib.rs schema/example.capnp
-	cargo +nightly wa build
+	cargo +nightly wasm build --release
 
 site/bundle.js: js/index.js js/io.js js/message.js build/schema/example.capnp.js
 	yarn webpack
