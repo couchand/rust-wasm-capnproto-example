@@ -10,10 +10,10 @@
   },
   "devDependencies": {
     "capnpc-js": "^0.2.4",
-    "webpack": "^3.10.0"
+    "webpack": "^4.0.1",
+    "webpack-cli": "^2.0.9"
   },
   "scripts": {
     "capnpc": "capnpc -o node_modules/.bin/capnpc-js:build schema/example.capnp",
-    "webpack": "webpack -d --devtool source-map js/index.js site/bundle.js"
   }
 }
