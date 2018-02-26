@@ -4,7 +4,7 @@ This is a little demonstration of Rust compiling to WASM, and using
 Cap'n Proto messages as a high-bandwidth communication channel between
 the Rust/WASM code and JavaScript code.
 
-## Uses
+## uses
 
 * Rust (currently a nightly)
 
@@ -27,41 +27,26 @@ the Rust/WASM code and JavaScript code.
 
 ## getting started
 
-1. Install the Rust nightly.
-
 ```sh
-> rustup toolchain install nightly
-```
+# 1. Install the Rust nightly.
+rustup toolchain install nightly
 
-2. Install & setup cargo-wasm.
+# 2. Install & setup cargo-wasm.
+cargo install cargo-wasm
+cargo wasm setup
 
-```sh
-> cargo install cargo-wasm
-> cargo wasm setup
-```
+# 3. Clone the repository.
+git clone git@github.com:couchand/rust-wasm-capnproto-example.git
+cd rust-wasm-capnproto-example
 
-3. Clone the repository.
+# 4. Install JavaScript dependencies.
+yarn
 
-```sh
-> git clone git@github.com:couchand/rust-wasm-capnproto-example.git
-```
+# 5. Build the project.
+make
 
-4. Install JavaScript dependencies.
-
-```sh
-> yarn
-```
-
-5. Build the project.
-
-```sh
-> make
-```
-
-6. Pull it up in your browser.
-
-```sh
-> yarn start
+# 6. Pull it up in your browser.
+yarn start
 ```
 
 ## more information
