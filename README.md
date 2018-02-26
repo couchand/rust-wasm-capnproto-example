@@ -61,7 +61,7 @@ the Rust/WASM code and JavaScript code.
 6. Pull it up in your browser.
 
 ```sh
-> xdg-open site/index.html
+> yarn start
 ```
 
 ## more information
