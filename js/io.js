@@ -59,7 +59,7 @@ function extractSlice(memory, inPointer) {
   /**
    * @param {Uint8Array} bytes
    */
-  const iterToI32 = (bytes) => {
+  const iterToI32 = bytes => {
     const view = new DataView(bytes.buffer);
     return view.getUint32(0, true);
   };
@@ -91,7 +91,9 @@ function getSliceData(memory, pointer, length) {
   const getData = function*(ptr, len) {
     const memView = new Uint8Array(memory.buffer);
     for (let index = 0; index < len; index++) {
-      if (memView[ptr] === undefined) { throw new Error(`Tried to read undef mem at ${ptr}`); }
+      if (memView[ptr] === undefined) {
+        throw new Error(`Tried to read undef mem at ${ptr}`);
+      }
       yield memView[ptr + index];
     }
   };

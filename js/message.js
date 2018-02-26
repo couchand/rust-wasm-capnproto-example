@@ -1,6 +1,6 @@
-const capnp = require('capnp-ts');
+const capnp = require("capnp-ts");
 
-const Point = require('../build/schema/example.capnp').Point;
+const Point = require("../build/schema/example.capnp").Point;
 
 function loadMessage(buffer) {
   const message = new capnp.Message(buffer);
