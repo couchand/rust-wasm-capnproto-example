@@ -16,6 +16,6 @@
     "webpack-cli": "^2.0.9"
   },
   "scripts": {
-    "start": "yarn hs dist/ -o"
+    "start": "yarn hs dist/ -c0 -o"
   }
 }
