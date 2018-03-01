@@ -63,7 +63,7 @@ fn wrap_message(mut message: Vec<u8>) -> WasmPointer {
   header as WasmPointer
 }
 
-fn unwrap_message<T: Sized>(header: WasmPointer, f: fn(&Vec<u8>) -> T) -> T {
+fn unwrap_message(header: WasmPointer) -> ::std::mem::ManuallyDrop<Vec<u8>> {
   // Read the pointer and length from the header.
   let slice = unsafe { Vec::from_raw_parts(header as *mut usize, 2, 2) };
   let ptr = slice[0];
@@ -75,13 +75,8 @@ fn unwrap_message<T: Sized>(header: WasmPointer, f: fn(&Vec<u8>) -> T) -> T {
   // Reconstruct the vector of message bytes.
   let message = unsafe { Vec::from_raw_parts(ptr as *mut u8, size as usize, size as usize) };
 
-  // Do something with the reconstructed message.
-  let result = f(&message);
-
   // We're actually borrowing the message from the caller.
-  ::std::mem::forget(message);
-
-  result
+  ::std::mem::ManuallyDrop::new(message)
 }
 
 fn drop_message(header: WasmPointer) {
@@ -108,22 +103,20 @@ pub fn make_point(x: f32, y: f32) -> WasmPointer {
 
 #[no_mangle]
 pub fn x(point: WasmPointer) -> f32 {
-  unwrap_message(point, |message| {
-    match example::read_x(message) {
-      Ok(res) => res,
-      Err(_) => -1.,
-    }
-  })
+  let message = unwrap_message(point);
+  match example::read_x(&*message) {
+    Ok(res) => res,
+    Err(_) => -1.,
+  }
 }
 
 #[no_mangle]
 pub fn y(point: WasmPointer) -> f32 {
-  unwrap_message(point, |message| {
-    match example::read_y(message) {
-      Ok(res) => res,
-      Err(_) => -1.,
-    }
-  })
+  let message = unwrap_message(point);
+  match example::read_y(&*message) {
+    Ok(res) => res,
+    Err(_) => -1.,
+  }
 }
 
 #[no_mangle]
