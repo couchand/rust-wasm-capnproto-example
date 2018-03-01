@@ -79,14 +79,14 @@ fn unwrap_message(header: WasmPointer) -> ::std::mem::ManuallyDrop<Vec<u8>> {
   ::std::mem::ManuallyDrop::new(message)
 }
 
-fn drop_message(header: WasmPointer) {
+fn use_message(header: WasmPointer) -> Vec<u8> {
   // Read the pointer and length from the header.
   let slice = unsafe { Vec::from_raw_parts(header as *mut usize, 2, 2) };
   let ptr = slice[0];
   let size = slice[1];
 
   // Reconstruct the vector of message bytes.
-  let _message = unsafe { Vec::from_raw_parts(ptr as *mut u8, size as usize, size as usize) };
+  unsafe { Vec::from_raw_parts(ptr as *mut u8, size as usize, size as usize) }
 }
 
 #[no_mangle]
@@ -121,7 +121,7 @@ pub fn y(point: WasmPointer) -> f32 {
 
 #[no_mangle]
 pub fn destroy_point(point: WasmPointer) {
-  drop_message(point);
+  use_message(point);
 }
 
 // from https://github.com/killercup/wasm-experiments
