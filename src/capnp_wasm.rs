@@ -41,7 +41,6 @@ pub fn unwrap_message(header: WasmPointer) -> ::std::mem::ManuallyDrop<Vec<u8>> 
   ::std::mem::ManuallyDrop::new(message)
 }
 
-
 /// Unwrap a transparent header to use the Cap'n'Proto message
 /// contained within it.  Takes ownership from the JS caller.
 pub fn use_message(header: WasmPointer) -> Vec<u8> {
