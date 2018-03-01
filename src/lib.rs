@@ -43,61 +43,75 @@ pub mod example {
   }
 }
 
+fn wrap_message(mut message: Vec<u8>) -> *mut ::std::os::raw::c_void {
+  // Find the length and raw pointer of the message.
+  let size = message.len();
+  let ptr = message.as_mut_ptr();
+
+  // We're actually moving the message to the caller.
+  ::std::mem::forget(message);
+
+  // Construct the header.
+  let mut slice = vec![ptr as u32, size as u32];
+  let header = slice.as_mut_ptr();
+
+  // We're actually moving the header to the caller.
+  ::std::mem::forget(slice);
+
+  header as *mut ::std::os::raw::c_void
+}
+
+fn unwrap_message<T: Sized>(header: *mut ::std::os::raw::c_void, f: fn(&Vec<u8>) -> T) -> T {
+  // Read the pointer and length from the header.
+  let slice = unsafe { Vec::from_raw_parts(header as *mut u32, 2, 2) };
+  let ptr = slice[0];
+  let size = slice[1];
+
+  // We're actually borrowing the header from the caller.
+  ::std::mem::forget(slice);
+
+  // Reconstruct the vector of message bytes.
+  let message = unsafe { Vec::from_raw_parts(ptr as *mut u8, size as usize, size as usize) };
+
+  // Do something with the reconstructed message.
+  let result = f(&message);
+
+  // We're actually borrowing the message from the caller.
+  ::std::mem::forget(message);
+
+  result
+}
+
 #[no_mangle]
 pub fn make_point(x: f32, y: f32) -> *mut ::std::os::raw::c_void {
-  let mut vec = Vec::new();
+  let mut message = Vec::new();
 
-  match example::make_point(&mut vec, x, y) {
+  match example::make_point(&mut message, x, y) {
     Ok(_) => (),
     Err(_) => return 0 as *mut ::std::os::raw::c_void,
   }
 
-  let len = vec.len();
-  let ptr = vec.as_mut_ptr();
-  ::std::mem::forget(vec);
-
-  let mut slice = vec![ptr as u32, len as u32];
-  let sliceptr = slice.as_mut_ptr();
-  ::std::mem::forget(slice);
-  sliceptr as *mut ::std::os::raw::c_void
+  wrap_message(message)
 }
 
 #[no_mangle]
 pub fn x(point: *mut ::std::os::raw::c_void) -> f32 {
-  let slice = unsafe { Vec::from_raw_parts(point as *mut u32, 2, 2) };
-  let ptr = slice[0];
-  let size = slice[1];
-  ::std::mem::forget(slice);
-
-  let vec = unsafe { Vec::from_raw_parts(ptr as *mut u8, size as usize, size as usize) };
-
-  let res = match example::read_x(&vec) {
-    Ok(res) => res,
-    Err(_) => -1.,
-  };
-
-  ::std::mem::forget(vec);
-
-  res
+  unwrap_message(point, |message| {
+    match example::read_x(message) {
+      Ok(res) => res,
+      Err(_) => -1.,
+    }
+  })
 }
 
 #[no_mangle]
 pub fn y(point: *mut ::std::os::raw::c_void) -> f32 {
-  let slice = unsafe { Vec::from_raw_parts(point as *mut u32, 2, 2) };
-  let ptr = slice[0];
-  let size = slice[1];
-  ::std::mem::forget(slice);
-
-  let vec = unsafe { Vec::from_raw_parts(ptr as *mut u8, size as usize, size as usize) };
-
-  let res = match example::read_y(&vec) {
-    Ok(res) => res,
-    Err(_) => -1.,
-  };
-
-  ::std::mem::forget(vec);
-
-  res
+  unwrap_message(point, |message| {
+    match example::read_y(message) {
+      Ok(res) => res,
+      Err(_) => -1.,
+    }
+  })
 }
 
 // from https://github.com/killercup/wasm-experiments
