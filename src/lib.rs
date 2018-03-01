@@ -82,6 +82,16 @@ fn unwrap_message<T: Sized>(header: *mut ::std::os::raw::c_void, f: fn(&Vec<u8>)
   result
 }
 
+fn drop_message(header: *mut ::std::os::raw::c_void) {
+  // Read the pointer and length from the header.
+  let slice = unsafe { Vec::from_raw_parts(header as *mut u32, 2, 2) };
+  let ptr = slice[0];
+  let size = slice[1];
+
+  // Reconstruct the vector of message bytes.
+  let _message = unsafe { Vec::from_raw_parts(ptr as *mut u8, size as usize, size as usize) };
+}
+
 #[no_mangle]
 pub fn make_point(x: f32, y: f32) -> *mut ::std::os::raw::c_void {
   let mut message = Vec::new();
@@ -112,6 +122,11 @@ pub fn y(point: *mut ::std::os::raw::c_void) -> f32 {
       Err(_) => -1.,
     }
   })
+}
+
+#[no_mangle]
+pub fn destroy_point(point: *mut ::std::os::raw::c_void) {
+  drop_message(point);
 }
 
 // from https://github.com/killercup/wasm-experiments
