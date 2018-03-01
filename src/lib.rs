@@ -45,6 +45,11 @@ pub mod example {
 
 type WasmPointer = *mut ::std::os::raw::c_void;
 
+/// Wrap a Cap'n'Proto message in a transparent header, giving
+/// ownership to the JS caller.
+///
+/// To avoid a memory leak, make sure to call `use_message` at some
+/// point in the future!
 fn wrap_message(mut message: Vec<u8>) -> WasmPointer {
   // Find the length and raw pointer of the message.
   let size = message.len();
@@ -63,6 +68,8 @@ fn wrap_message(mut message: Vec<u8>) -> WasmPointer {
   header as WasmPointer
 }
 
+/// Unwrap a transparent header to use the Cap'n'Proto message
+/// contained within it.  Borrows the header from the JS caller.
 fn unwrap_message(header: WasmPointer) -> ::std::mem::ManuallyDrop<Vec<u8>> {
   // Read the pointer and length from the header.
   let slice = unsafe { Vec::from_raw_parts(header as *mut usize, 2, 2) };
@@ -79,6 +86,9 @@ fn unwrap_message(header: WasmPointer) -> ::std::mem::ManuallyDrop<Vec<u8>> {
   ::std::mem::ManuallyDrop::new(message)
 }
 
+
+/// Unwrap a transparent header to use the Cap'n'Proto message
+/// contained within it.  Takes ownership from the JS caller.
 fn use_message(header: WasmPointer) -> Vec<u8> {
   // Read the pointer and length from the header.
   let slice = unsafe { Vec::from_raw_parts(header as *mut usize, 2, 2) };
