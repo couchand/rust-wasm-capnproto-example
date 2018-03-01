@@ -43,7 +43,9 @@ pub mod example {
   }
 }
 
-fn wrap_message(mut message: Vec<u8>) -> *mut ::std::os::raw::c_void {
+type WasmPointer = *mut ::std::os::raw::c_void;
+
+fn wrap_message(mut message: Vec<u8>) -> WasmPointer {
   // Find the length and raw pointer of the message.
   let size = message.len();
   let ptr = message.as_mut_ptr();
@@ -58,10 +60,10 @@ fn wrap_message(mut message: Vec<u8>) -> *mut ::std::os::raw::c_void {
   // We're actually moving the header to the caller.
   ::std::mem::forget(slice);
 
-  header as *mut ::std::os::raw::c_void
+  header as WasmPointer
 }
 
-fn unwrap_message<T: Sized>(header: *mut ::std::os::raw::c_void, f: fn(&Vec<u8>) -> T) -> T {
+fn unwrap_message<T: Sized>(header: WasmPointer, f: fn(&Vec<u8>) -> T) -> T {
   // Read the pointer and length from the header.
   let slice = unsafe { Vec::from_raw_parts(header as *mut u32, 2, 2) };
   let ptr = slice[0];
@@ -82,7 +84,7 @@ fn unwrap_message<T: Sized>(header: *mut ::std::os::raw::c_void, f: fn(&Vec<u8>)
   result
 }
 
-fn drop_message(header: *mut ::std::os::raw::c_void) {
+fn drop_message(header: WasmPointer) {
   // Read the pointer and length from the header.
   let slice = unsafe { Vec::from_raw_parts(header as *mut u32, 2, 2) };
   let ptr = slice[0];
@@ -93,19 +95,19 @@ fn drop_message(header: *mut ::std::os::raw::c_void) {
 }
 
 #[no_mangle]
-pub fn make_point(x: f32, y: f32) -> *mut ::std::os::raw::c_void {
+pub fn make_point(x: f32, y: f32) -> WasmPointer {
   let mut message = Vec::new();
 
   match example::make_point(&mut message, x, y) {
     Ok(_) => (),
-    Err(_) => return 0 as *mut ::std::os::raw::c_void,
+    Err(_) => return 0 as WasmPointer,
   }
 
   wrap_message(message)
 }
 
 #[no_mangle]
-pub fn x(point: *mut ::std::os::raw::c_void) -> f32 {
+pub fn x(point: WasmPointer) -> f32 {
   unwrap_message(point, |message| {
     match example::read_x(message) {
       Ok(res) => res,
@@ -115,7 +117,7 @@ pub fn x(point: *mut ::std::os::raw::c_void) -> f32 {
 }
 
 #[no_mangle]
-pub fn y(point: *mut ::std::os::raw::c_void) -> f32 {
+pub fn y(point: WasmPointer) -> f32 {
   unwrap_message(point, |message| {
     match example::read_y(message) {
       Ok(res) => res,
@@ -125,21 +127,21 @@ pub fn y(point: *mut ::std::os::raw::c_void) -> f32 {
 }
 
 #[no_mangle]
-pub fn destroy_point(point: *mut ::std::os::raw::c_void) {
+pub fn destroy_point(point: WasmPointer) {
   drop_message(point);
 }
 
 // from https://github.com/killercup/wasm-experiments
 #[no_mangle]
-pub fn alloc(size: usize) -> *mut ::std::os::raw::c_void {
+pub fn alloc(size: usize) -> WasmPointer {
     let mut buf = Vec::with_capacity(size);
     let ptr = buf.as_mut_ptr();
     ::std::mem::forget(buf);
-    return ptr as *mut ::std::os::raw::c_void;
+    return ptr as WasmPointer;
 }
 
 #[no_mangle]
-pub fn dealloc(ptr: *mut ::std::os::raw::c_void, cap: usize) {
+pub fn dealloc(ptr: WasmPointer, cap: usize) {
     unsafe  {
         let _buf = Vec::from_raw_parts(ptr, 0, cap);
     }
