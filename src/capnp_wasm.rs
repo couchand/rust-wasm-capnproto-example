@@ -1,11 +1,17 @@
-pub type WasmPointer = *mut ::std::os::raw::c_void;
+/// A transparent header for a Cap'n'Proto message.
+///
+/// Holds a raw pointer to the message data and the length of the
+/// message in bytes.  It is "transparent" in the sense that the JS
+/// side can freely deconstruct it to locate and reference the
+/// underlying message.
+pub type MessageHeader = *mut ::std::os::raw::c_void;
 
 /// Wrap a Cap'n'Proto message in a transparent header, giving
 /// ownership to the JS caller.
 ///
 /// To avoid a memory leak, make sure to call `use_message` at some
 /// point in the future!
-pub fn wrap_message(mut message: Vec<u8>) -> WasmPointer {
+pub fn wrap_message(mut message: Vec<u8>) -> MessageHeader {
   // Find the length and raw pointer of the message.
   let size = message.len();
   let ptr = message.as_mut_ptr();
@@ -20,12 +26,12 @@ pub fn wrap_message(mut message: Vec<u8>) -> WasmPointer {
   // We're actually moving the header to the caller.
   ::std::mem::forget(slice);
 
-  header as WasmPointer
+  header as MessageHeader
 }
 
 /// Unwrap a transparent header to use the Cap'n'Proto message
 /// contained within it.  Borrows the header from the JS caller.
-pub fn unwrap_message(header: WasmPointer) -> ::std::mem::ManuallyDrop<Vec<u8>> {
+pub fn unwrap_message(header: MessageHeader) -> ::std::mem::ManuallyDrop<Vec<u8>> {
   // Read the pointer and length from the header.
   let slice = unsafe { Vec::from_raw_parts(header as *mut usize, 2, 2) };
   let ptr = slice[0];
@@ -43,7 +49,7 @@ pub fn unwrap_message(header: WasmPointer) -> ::std::mem::ManuallyDrop<Vec<u8>> 
 
 /// Unwrap a transparent header to use the Cap'n'Proto message
 /// contained within it.  Takes ownership from the JS caller.
-pub fn use_message(header: WasmPointer) -> Vec<u8> {
+pub fn use_message(header: MessageHeader) -> Vec<u8> {
   // Read the pointer and length from the header.
   let slice = unsafe { Vec::from_raw_parts(header as *mut usize, 2, 2) };
   let ptr = slice[0];

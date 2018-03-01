@@ -47,19 +47,19 @@ pub mod example {
 }
 
 #[no_mangle]
-pub fn make_point(x: f32, y: f32) -> WasmPointer {
+pub fn make_point(x: f32, y: f32) -> MessageHeader {
   let mut message = Vec::new();
 
   match example::make_point(&mut message, x, y) {
     Ok(_) => (),
-    Err(_) => return 0 as WasmPointer,
+    Err(_) => return 0 as MessageHeader,
   }
 
   wrap_message(message)
 }
 
 #[no_mangle]
-pub fn x(point: WasmPointer) -> f32 {
+pub fn x(point: MessageHeader) -> f32 {
   let message = unwrap_message(point);
   match example::read_x(&*message) {
     Ok(res) => res,
@@ -68,7 +68,7 @@ pub fn x(point: WasmPointer) -> f32 {
 }
 
 #[no_mangle]
-pub fn y(point: WasmPointer) -> f32 {
+pub fn y(point: MessageHeader) -> f32 {
   let message = unwrap_message(point);
   match example::read_y(&*message) {
     Ok(res) => res,
@@ -77,21 +77,21 @@ pub fn y(point: WasmPointer) -> f32 {
 }
 
 #[no_mangle]
-pub fn destroy_point(point: WasmPointer) {
+pub fn destroy_point(point: MessageHeader) {
   use_message(point);
 }
 
 // from https://github.com/killercup/wasm-experiments
 #[no_mangle]
-pub fn alloc(size: usize) -> WasmPointer {
+pub fn alloc(size: usize) -> *mut ::std::os::raw::c_void {
     let mut buf = Vec::with_capacity(size);
     let ptr = buf.as_mut_ptr();
     ::std::mem::forget(buf);
-    return ptr as WasmPointer;
+    return ptr as *mut ::std::os::raw::c_void;
 }
 
 #[no_mangle]
-pub fn dealloc(ptr: WasmPointer, cap: usize) {
+pub fn dealloc(ptr: *mut ::std::os::raw::c_void, cap: usize) {
     unsafe  {
         let _buf = Vec::from_raw_parts(ptr, 0, cap);
     }
