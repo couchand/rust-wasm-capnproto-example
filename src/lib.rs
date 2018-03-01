@@ -54,7 +54,7 @@ fn wrap_message(mut message: Vec<u8>) -> WasmPointer {
   ::std::mem::forget(message);
 
   // Construct the header.
-  let mut slice = vec![ptr as u32, size as u32];
+  let mut slice = vec![ptr as usize, size as usize];
   let header = slice.as_mut_ptr();
 
   // We're actually moving the header to the caller.
@@ -65,7 +65,7 @@ fn wrap_message(mut message: Vec<u8>) -> WasmPointer {
 
 fn unwrap_message<T: Sized>(header: WasmPointer, f: fn(&Vec<u8>) -> T) -> T {
   // Read the pointer and length from the header.
-  let slice = unsafe { Vec::from_raw_parts(header as *mut u32, 2, 2) };
+  let slice = unsafe { Vec::from_raw_parts(header as *mut usize, 2, 2) };
   let ptr = slice[0];
   let size = slice[1];
 
@@ -86,7 +86,7 @@ fn unwrap_message<T: Sized>(header: WasmPointer, f: fn(&Vec<u8>) -> T) -> T {
 
 fn drop_message(header: WasmPointer) {
   // Read the pointer and length from the header.
-  let slice = unsafe { Vec::from_raw_parts(header as *mut u32, 2, 2) };
+  let slice = unsafe { Vec::from_raw_parts(header as *mut usize, 2, 2) };
   let ptr = slice[0];
   let size = slice[1];
 
