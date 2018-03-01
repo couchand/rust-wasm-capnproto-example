@@ -3,7 +3,7 @@
 Cargo.lock
 
 /build/
-/site/capnproto_example.wasm
-/site/bundle.js
-/site/bundle.js.map
+/dist/capnproto_example.wasm
+/dist/main.js
+/dist/main.js.map
 /node_modules/

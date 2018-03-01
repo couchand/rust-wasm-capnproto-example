@@ -2,22 +2,25 @@
 all: rust js
 
 .PHONY: rust
-rust: site/capnproto_example.wasm
+rust: dist/capnproto_example.wasm
 
 .PHONY: js
-js: site/bundle.js
+js: dist/bundle.js
 
-site/capnproto_example.wasm: src/lib.rs schema/example.capnp
+dist/capnproto_example.wasm: src/lib.rs schema/example.capnp
+	mkdir site
 	cargo +nightly wasm build --release
+	mv site/capnproto_example.wasm dist
+	rmdir site
 
-site/bundle.js: js/index.js js/io.js js/message.js build/schema/example.capnp.js
-	yarn webpack
+dist/bundle.js: src/index.js src/io.js src/message.js build/schema/example.capnp.js
+	yarn webpack --mode=production
 
 build/schema/example.capnp.js: schema/example.capnp build
-	yarn capnpc
+	capnpc -o node_modules/.bin/capnpc-js:build schema/example.capnp
 
 build:
 	mkdir build
 
 clean:
-	rm -rf build site/bundle.js site/bundle.js.map site/capnproto_example.wasm target
+	rm -rf build dist/bundle.js dist/bundle.js.map dist/capnproto_example.wasm target
