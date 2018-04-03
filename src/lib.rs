@@ -3,6 +3,9 @@ pub mod example_capnp {
   include!(concat!(env!("OUT_DIR"), "/example_capnp.rs"));
 }
 
+mod capnp_wasm;
+use capnp_wasm::*;
+
 pub mod example {
   use example_capnp::point;
   use capnp::serialize_packed;
@@ -44,60 +47,38 @@ pub mod example {
 }
 
 #[no_mangle]
-pub fn make_point(x: f32, y: f32) -> *mut ::std::os::raw::c_void {
-  let mut vec = Vec::new();
+pub fn make_point(x: f32, y: f32) -> MessageHeader {
+  let mut message = Vec::new();
 
-  match example::make_point(&mut vec, x, y) {
+  match example::make_point(&mut message, x, y) {
     Ok(_) => (),
-    Err(_) => return 0 as *mut ::std::os::raw::c_void,
+    Err(_) => return 0 as MessageHeader,
   }
 
-  let len = vec.len();
-  let ptr = vec.as_mut_ptr();
-  ::std::mem::forget(vec);
-
-  let mut slice = vec![ptr as u32, len as u32];
-  let sliceptr = slice.as_mut_ptr();
-  ::std::mem::forget(slice);
-  sliceptr as *mut ::std::os::raw::c_void
+  wrap_message(message)
 }
 
 #[no_mangle]
-pub fn x(point: *mut ::std::os::raw::c_void) -> f32 {
-  let slice = unsafe { Vec::from_raw_parts(point as *mut u32, 2, 2) };
-  let ptr = slice[0];
-  let size = slice[1];
-  ::std::mem::forget(slice);
-
-  let vec = unsafe { Vec::from_raw_parts(ptr as *mut u8, size as usize, size as usize) };
-
-  let res = match example::read_x(&vec) {
+pub fn x(point: MessageHeader) -> f32 {
+  let message = unwrap_message(point);
+  match example::read_x(&*message) {
     Ok(res) => res,
     Err(_) => -1.,
-  };
-
-  ::std::mem::forget(vec);
-
-  res
+  }
 }
 
 #[no_mangle]
-pub fn y(point: *mut ::std::os::raw::c_void) -> f32 {
-  let slice = unsafe { Vec::from_raw_parts(point as *mut u32, 2, 2) };
-  let ptr = slice[0];
-  let size = slice[1];
-  ::std::mem::forget(slice);
-
-  let vec = unsafe { Vec::from_raw_parts(ptr as *mut u8, size as usize, size as usize) };
-
-  let res = match example::read_y(&vec) {
+pub fn y(point: MessageHeader) -> f32 {
+  let message = unwrap_message(point);
+  match example::read_y(&*message) {
     Ok(res) => res,
     Err(_) => -1.,
-  };
+  }
+}
 
-  ::std::mem::forget(vec);
-
-  res
+#[no_mangle]
+pub fn destroy_point(point: MessageHeader) {
+  use_message(point);
 }
 
 // from https://github.com/killercup/wasm-experiments

@@ -8,6 +8,7 @@ fetch("capnproto_example.wasm")
     const {
       memory,
       make_point,
+      destroy_point,
       x,
       y,
       alloc,
@@ -24,6 +25,8 @@ fetch("capnproto_example.wasm")
 
     document.querySelector("#wasm-wasm-x").innerHTML = x(pointer);
     document.querySelector("#wasm-wasm-y").innerHTML = y(pointer);
+
+    destroy_point(pointer);
 
     const pointBack = writeMessage(42, Math.PI);
     const pointerBack = newSlice(memory, alloc, pointBack);
